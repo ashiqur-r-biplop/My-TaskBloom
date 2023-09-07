@@ -2,17 +2,18 @@
 import { faEye, faEyeSlash, faL } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { AuthContext } from "../Provider/AuthProvider";
+import { addToDb } from "../Hook/UseSetUsers";
 const Register = () => {
   const [toggleIcon, setToggleIcon] = useState(false);
   const [toggleIconConfirm, setToggleIconConfirm] = useState(false);
   const [errorMassage, setErrorMassage] = useState("");
-  const [gander, setGender] = useState("Others");
+
   const navigate = useNavigate();
-  const { signUp, signInGoogle, signInGithub, ProfileUpdate, setReload } =
+  const { user, signUp, ProfileUpdate, setReload, setLoading } =
     useContext(AuthContext);
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -23,14 +24,14 @@ const Register = () => {
     reset,
     formState: { errors },
   } = useForm();
+
   const onSubmit = (data) => {
-    const email = data.email;
-    const password = data.password;
-    const confirmPassword = data.confirmPassword;
-    const name = data.name;
-    const photo = data.photoUrl;
-    const contact = data.phoneNumber;
-    const address = data.address;
+    const email = data?.email;
+    const password = data?.password;
+    const confirmPassword = data?.confirmPassword;
+    const name = data?.name;
+    const bio = data?.bio;
+    const photo = data?.photoUrl;
     if (password !== confirmPassword) {
       setErrorMassage("Password an confirm password doesn't match");
       return;
@@ -48,28 +49,11 @@ const Register = () => {
             email,
             name,
             photo,
-            role: "student",
-            gander,
-            contact,
-            address,
+            bio,
           };
-          // console.log(saveUser);
-          fetch("https://creativa-design-hub-server-site.vercel.app/users", {
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-            },
-            body: JSON.stringify(saveUser),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.insertedId) {
-                reset();
-                Swal.fire("Good job!", "User created successfully", "success");
-                navigate(from, { replace: true });
-              }
-            });
-
+          addToDb("users", saveUser, email);
+          setLoading(false);
+          navigate(from, { replace: true });
           reset();
         });
       })
@@ -85,14 +69,12 @@ const Register = () => {
         });
       });
   };
-  const handleGender = (e) => {
-    setGender(e.target.value);
-  };
-
-
+  if (user) {
+    return <Navigate to="/"></Navigate>;
+  }
   return (
     <div className="container mx-auto md:pt-32 p-3">
-      <div style={{ width: "100%" }}>
+      <div className="lg:w-1/3 md:1/2 mx-auto">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col justify-center items-center h-full"
@@ -110,9 +92,24 @@ const Register = () => {
             <input
               type="email"
               {...register("email", { required: true })}
-              placeholder="CreativaDesignHub.world@gmail.com"
+              placeholder="mytaskBloom@gmail.com"
               className="border"
             />
+            <textarea
+              type="text"
+              {...register("bio", { required: true })}
+              placeholder="Provide bio"
+              className="border w-full"
+            ></textarea>
+            <div className="md:flex w-full justify-between items-center">
+              <input
+                type="url"
+                {...register("photoUrl", { required: true })}
+                placeholder="Enter Your Photo URL"
+                className="border"
+              />
+            </div>
+
             <div className="w-full relative">
               <input
                 type={`${toggleIcon ? "text" : "password"}`}
@@ -184,31 +181,7 @@ const Register = () => {
               </span>
             </div>
             {<p className="text-red-700 ">{errorMassage}</p>}
-            <div className="md:flex w-full justify-between items-center">
-              <input
-                type="url"
-                {...register("photoUrl", { required: true })}
-                placeholder="Enter Your Photo URL"
-                className="border mt-5"
-              />
-              <input
-                type="number"
-                {...register("phoneNumber", { required: true })}
-                placeholder="Enter Your Phone Number"
-                className="border mt-5 ms-2"
-              />
-            </div>
-            <input
-              type="text"
-              {...register("address", { required: true })}
-              placeholder="Enter Your Address"
-              className="border"
-            />
-            <select onChange={handleGender} className="border">
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-              <option value="other">other</option>
-            </select>
+
             <p className="mb-3 text-end w-full forget-password">
               Forget Password
             </p>
@@ -223,7 +196,6 @@ const Register = () => {
               value="Login"
               className="bg-[#32c770] border-0 text-white font-semibold cursor-pointer"
             />
-            
           </div>
         </form>
       </div>

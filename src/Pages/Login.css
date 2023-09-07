@@ -1,29 +1,40 @@
-input, select {
-    margin-bottom: 20px;
+input,
+textarea {
+    margin-bottom: 10px;
     width: 100%;
     padding: 10px 10px;
     outline: none;
-    background-color: none
+    background-color: none;
+    height: 50px;
 }
-input:focus , select:focus {
+
+input:focus,
+textarea:focus {
     border: 2px solid #267E23;
 }
+
 .fullForm {
     padding: 48px 28px;
 }
+
 .forget-password {
     cursor: pointer;
     color: #267E23;
 }
-.swal2-styled.swal2-confirm{
+
+.swal2-styled.swal2-confirm {
     background-color: #267E23 !important;
 }
-.swal2-x-mark-line-left, .swal2-x-mark-line-right {
+
+.swal2-x-mark-line-left,
+.swal2-x-mark-line-right {
     background-color: #267E23 !important;
 }
+
 .swal2-icon.swal2-error {
     border-color: #267E23 !important;
 }
+
 .toggle-icon {
     cursor: pointer;
 }

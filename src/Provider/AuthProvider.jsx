@@ -16,12 +16,14 @@ const AuthProvider = ({ children }) => {
   const auth = getAuth(app);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(false);
+
   const signUp = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const login = (email, password) => {
+  const handleLogin = (email, password) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
@@ -32,10 +34,11 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        // console.log("data");
+        console.log(currentUser);
+        setUser(currentUser)
+        setLoading(false);
       } else {
         console.log("logout successfully");
-        localStorage.removeItem("access-token");
         setUser(currentUser);
         setLoading(false);
       }
@@ -55,11 +58,13 @@ const AuthProvider = ({ children }) => {
     user,
     signUp,
     setUser,
-    login,
+    handleLogin,
     logout,
     loading,
     ProfileUpdate,
     auth,
+    setReload,
+    reload,
     setLoading,
   };
 

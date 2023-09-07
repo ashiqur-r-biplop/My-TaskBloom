@@ -2,7 +2,7 @@
 /* eslint-disable no-dupe-keys */
 /* eslint-disable react/no-unescaped-entities */
 import React, { useContext, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import "./Login.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../Provider/AuthProvider";
 
 const Login = () => {
-  const { login, signInGoogle, signInGithub, auth } = useContext(AuthContext);
+  const { user, handleLogin } = useContext(AuthContext);
   const [toggleIcon, setToggleIcon] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const Login = () => {
     formState: { errors },
   } = useForm();
   const onSubmit = (data) => {
-    login(data.email, data.password)
+    handleLogin(data.email, data.password)
       .then((result) => {
         const loggedUser = result.user;
         Swal.fire({
@@ -50,6 +50,9 @@ const Login = () => {
         });
       });
   };
+  if (user) {
+    return <Navigate to="/"></Navigate>;
+  }
 
   return (
     <div className="container mx-auto ">
